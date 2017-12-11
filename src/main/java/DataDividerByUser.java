@@ -36,6 +36,13 @@ public class DataDividerByUser {
 				throws IOException, InterruptedException {
 
 			//merge data for one user
+			//key = user_id, value = <movieID:rating, movieID:rating,...>
+			StringBuilder sb = new StringBuilder();
+			while (values.iterator().hasNext()) {
+				sb.append("," + values.iterator().next().toString());
+			}
+
+			context.write(key, new Text(sb.toString().replaceFirst(",", "")));
 		}
 	}
 
