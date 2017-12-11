@@ -26,82 +26,30 @@ public class RecommenderListGenerator {
 
 		//filter out watched movies
 		//match movie_name to movie_id
-		Map<Integer, List<Integer>> watchHistory = new HashMap<>();
-		
+
 		@Override
 		protected void setup(Context context) throws IOException {
-			//read movie watch history 
-			Configuration conf = context.getConfiguration();
-			String filePath = conf.get("watchHistory");
-			Path pt = new Path(filePath);
-			FileSystem fs = FileSystem.get(conf);
-			BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(pt)));
-			String line = br.readLine();
-			
-			//user,movie,rating
-			while(line != null) {
-				int user = Integer.parseInt(line.split(",")[0]);
-				int movie = Integer.parseInt(line.split(",")[1]);
-				if(watchHistory.containsKey(user)) {
-					watchHistory.get(user).add(movie);
-				}
-				else {
-					List<Integer> list = new ArrayList<>();
-					list.add(movie);
-					watchHistory.put(user, list);
-				}
-				line = br.readLine();
-			}
-			br.close();
+
 		}
 
 		@Override
 		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-			//recommender user \t movie:rating
-			String[] tokens = value.toString().split("\t");
-			int user = Integer.parseInt(tokens[0]);
-			int movie = Integer.parseInt(tokens[1].split(":")[0]);
-			if(!watchHistory.get(user).contains(movie)) {
-				context.write(new IntWritable(user), new Text(movie + ":" + tokens[1].split(":")[1]));
-			}
+
 		}
 	}
 
 	public static class RecommenderListGeneratorReducer extends Reducer<IntWritable, Text, IntWritable, Text> {
 
-		Map<Integer, String> movieTitles = new HashMap<>();
-		//match movie_name to movie_id
 		@Override
 		protected void setup(Context context) throws IOException {
-			//<movie_id, movie_title>
-			//read movie title from file
-			Configuration conf = context.getConfiguration();
-			String filePath = conf.get("movieTitles");
-			Path pt = new Path(filePath);
-			FileSystem fs = FileSystem.get(conf);
-			BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(pt)));
-			String line = br.readLine();
-			//movieid,movie_name
-			while(line != null) {
-				int movie_id = Integer.parseInt(line.trim().split(",")[0]);
-				movieTitles.put(movie_id, line.trim().split(",")[1]);
-				line = br.readLine();
-			}
-			br.close();
+
 		}
 
 		// reduce method
 		@Override
 		public void reduce(IntWritable key, Iterable<Text> values, Context context)
 				throws IOException, InterruptedException {
-			//movie_id:rating
-			while(values.iterator().hasNext()) {
-				String cur = values.iterator().next().toString();
-				int movie_id = Integer.parseInt(cur.split(":")[0]);
-				String rating = cur.split(":")[1];
-				
-				context.write(key, new Text(movieTitles.get(movie_id) + ":" + rating));
-			}
+
 		}
 	}
 
