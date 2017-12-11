@@ -50,7 +50,7 @@ public class DataDividerByUser {
 
 		Configuration conf = new Configuration();
 
-		Job job = Job.getInstance();
+		Job job = Job.getInstance(conf);
 		job.setMapperClass(DataDividerMapper.class);
 		job.setReducerClass(DataDividerReducer.class);
 

@@ -62,18 +62,16 @@ public class CoOccurrenceMatrixGenerator {
 		Job job = Job.getInstance(conf);
 		job.setMapperClass(MatrixGeneratorMapper.class);
 		job.setReducerClass(MatrixGeneratorReducer.class);
-		
+
 		job.setJarByClass(CoOccurrenceMatrixGenerator.class);
-		
 		job.setInputFormatClass(TextInputFormat.class);
 		job.setOutputFormatClass(TextOutputFormat.class);
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(IntWritable.class);
-		
+
 		TextInputFormat.setInputPaths(job, new Path(args[0]));
 		TextOutputFormat.setOutputPath(job, new Path(args[1]));
-		
+
 		job.waitForCompletion(true);
-		
 	}
 }
