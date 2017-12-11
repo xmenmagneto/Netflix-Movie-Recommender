@@ -26,9 +26,10 @@ public class Multiplication {
 	public static class MultiplicationMapper extends Mapper<LongWritable, Text, Text, DoubleWritable> {
 
 		Map<Integer, List<MovieRelation>> movieRelationMap = new HashMap<Integer,List<MovieRelation>>();
+		Map<Integer, Integer> denominator = new HashMap<Integer, Integer>();
 
 		@Override
-		protected void setup(Context context) throws IOException {
+		protected void setup(Context context) throws IOException {  //create hashMap
 			Configuration conf = context.getConfiguration();
 			String filePath = conf.get("coOccurrencePath", "/coOccurrenceMatrix/part-r-00000");
 			Path pt = new Path(filePath);
@@ -53,13 +54,44 @@ public class Multiplication {
 					list.add(movieRelation);
 					movieRelationMap.put(movie1, list);
 				}
+				line = br.readLine();
 			}
+			br.close();
+
+			//create denominator
+			for (Map.Entry<Integer, List<MovieRelation>> entry : movieRelationMap.entrySet()) {
+				int sum = 0;
+				for (MovieRelation relation : entry.getValue()) {
+					sum += relation.getRelation();
+				}
+				denominator.put(entry.getKey(), sum);
+			}
+
 		}
 
 		// map method
 		@Override
 		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+			//input user, movie, rating
+			//output: user:movie score
+			String[] tokens = value.toString().trim().split(",");
+			int user = Integer.parseInt(tokens[0]);
+			int movie = Integer.parseInt(tokens[1]);
+			double rating = Double.parseDouble(tokens[2]);
 
+			for (MovieRelation relation : movieRelationMap.get(movie)) {
+				double score = rating * relation.getRelation(); // 5 * 8 = 40
+				//normalize score
+				//method1:计算分母： map.get(movie2).sum(relation) ==> denominator
+				//method2: use another map: map<movie_id, sum>
+				score = score / denominator.get(relation.getMovie2());
+				DecimalFormat df = new DecimalFormat("#.00");
+				score = Double.valueOf(df.format(score));
+
+				context.write(new Text(user + ":" + relation.getMovie2()), new DoubleWritable(score));
+				//输出结果user \t movieTag:score
+				//==> user + movieTag : score
+			}
 
 		}
 	}
@@ -74,25 +106,25 @@ public class Multiplication {
 	}
 
 	public static void main(String[] args) throws Exception {
-		Configuration conf = new Configuration();
-		conf.set("coOccurrencePath", args[0]);
-		
-		Job job = Job.getInstance();
-		job.setMapperClass(MultiplicationMapper.class);
-		job.setReducerClass(MultiplicationReducer.class);
-		
-		job.setJarByClass(Multiplication.class);
-		
-		job.setInputFormatClass(TextInputFormat.class);
-		job.setOutputFormatClass(TextOutputFormat.class);
-		job.setOutputKeyClass(IntWritable.class);
-		job.setOutputValueClass(Text.class);
-		job.setMapOutputKeyClass(Text.class);
-		job.setMapOutputValueClass(DoubleWritable.class);
-		
-		TextInputFormat.setInputPaths(job, new Path(args[1]));
-		TextOutputFormat.setOutputPath(job, new Path(args[2]));
-		
-		job.waitForCompletion(true);
+//		Configuration conf = new Configuration();
+//		conf.set("coOccurrencePath", args[0]);
+//
+//		Job job = Job.getInstance();
+//		job.setMapperClass(MultiplicationMapper.class);
+//		job.setReducerClass(MultiplicationReducer.class);
+//
+//		job.setJarByClass(Multiplication.class);
+//
+//		job.setInputFormatClass(TextInputFormat.class);
+//		job.setOutputFormatClass(TextOutputFormat.class);
+//		job.setOutputKeyClass(IntWritable.class);
+//		job.setOutputValueClass(Text.class);
+//		job.setMapOutputKeyClass(Text.class);
+//		job.setMapOutputValueClass(DoubleWritable.class);
+//
+//		TextInputFormat.setInputPaths(job, new Path(args[1]));
+//		TextOutputFormat.setOutputPath(job, new Path(args[2]));
+//
+//		job.waitForCompletion(true);
 	}
 }
