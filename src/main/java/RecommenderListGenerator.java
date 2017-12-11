@@ -50,7 +50,9 @@ public class RecommenderListGenerator {
 					list.add(movie);
 					watchHistory.put(user, list);
 				}
+				line = br.readLine();
 			}
+			br.close();
 		}
 
 		@Override
@@ -67,16 +69,41 @@ public class RecommenderListGenerator {
 
 	public static class RecommenderListGeneratorReducer extends Reducer<IntWritable, Text, IntWritable, Text> {
 
+		Map<Integer, String> movieTitles = new HashMap<Integer, String>();
+
 		@Override
 		protected void setup(Context context) throws IOException {
+			//Map<movie_id, movie_title>
+			//match movie name to movie id
+			//read movie title from file
+			Configuration conf = context.getConfiguration();
+			String filePath = conf.get("movieTitles");
+			Path pt = new Path(filePath);
+			FileSystem fs = FileSystem.get(conf);
+			BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(pt)));
+			String line = br.readLine();
 
+			//movie_id, movie_name
+			while (line != null) {
+				int movie_id = Integer.parseInt(line.trim().split(",")[0]);
+				movieTitles.put(movie_id, line.trim().split(",")[1]);
+				line = br.readLine();
+			}
+			br.close();
 		}
 
 		// reduce method
 		@Override
 		public void reduce(IntWritable key, Iterable<Text> values, Context context)
 				throws IOException, InterruptedException {
-			//match movie name to movie id
+			//movie_id:rating
+			while (values.iterator().hasNext()) {
+				String cur = values.iterator().next().toString();
+				int movie_id = Integer.parseInt(cur.split(":")[0]);
+				String rating = cur.split(":")[1];
+
+				context.write(key, new Text(movieTitles.get(movie_id) + ":" + rating));
+			}
 		}
 	}
 
