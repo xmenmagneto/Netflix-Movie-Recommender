@@ -18,9 +18,24 @@ public class CoOccurrenceMatrixGenerator {
 		@Override
 		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 			//value = userid \t movie1: rating, movie2: rating...
-			//key = movie1: movie2 value = 1
+			//key = movie1: movie2, value = 1
 			//calculate each user rating list: <movieA, movieB>
-			
+			String line = value.toString().trim();
+			String[] user_movieRatings = line.split("\t");
+			String user = user_movieRatings[0];
+			String[] movie_ratings = user_movieRatings[1].split(",");
+			//{movie1:rating, movie2:rating,...}
+
+			for (int i = 0; i < movie_ratings.length; i++) {
+				String movie1 = movie_ratings[i].trim().split(":")[0]; //just get movieID
+
+				for (int j = 0; j < movie_ratings.length; j++) {
+					String movie2 = movie_ratings[j].trim().split(":")[0];
+					context.write(new Text(movie1 + ":" + movie2), new IntWritable(1));
+				}
+			}
+
+
 		}
 	}
 
