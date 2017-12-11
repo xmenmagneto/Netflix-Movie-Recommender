@@ -25,7 +25,7 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 public class Multiplication {
 	public static class MultiplicationMapper extends Mapper<LongWritable, Text, Text, DoubleWritable> {
 
-		Map<Integer, List<MovieRelation>> movieRelationMap = new HashMap<>();
+		Map<Integer, List<MovieRelation>> movieRelationMap = new HashMap<Integer,List<MovieRelation>>();
 
 		@Override
 		protected void setup(Context context) throws IOException {
@@ -38,38 +38,29 @@ public class Multiplication {
 			
 			while(line != null) {
 				//movieA:movieB \t relation
-				String[] tokens = line.toString().trim.split("\t");
-				String[] moives = tokens[0].split(":");
+				String[] tokens = line.toString().trim().split("\t");
+				String[] movies = tokens[0].split(":");
 
-				int movie1 = Integer.parseInt(moives[0]);
+				int movie1 = Integer.parseInt(movies[0]);
 				int movie2 = Integer.parseInt(movies[1]);
 				int relation = Integer.parseInt(tokens[2]);
 
-				MovieRelation
+				MovieRelation movieRelation = new MovieRelation(movie1, movie2, relation);
+				if (movieRelationMap.containsKey(movie1)) {
+					movieRelationMap.get(movie1).add(movieRelation);
+				} else {
+					List<MovieRelation> list = new ArrayList<MovieRelation>();
+					list.add(movieRelation);
+					movieRelationMap.put(movie1, list);
+				}
 			}
-
-			
 		}
 
 		// map method
 		@Override
 		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-			//input user,movie,rating
-			//output user:movie score
-			String[] tokens = value.toString().trim().split(",");
-			int user = Integer.parseInt(tokens[0]);
-			int movie = Integer.parseInt(tokens[1]);
-			double rating = Double.parseDouble(tokens[2]);
-			
-			for(MovieRelation relation : movieRelationMap.get(movie)) {
-				double score = rating * relation.getRelation(); //5 * 8 = 40
-				//normalize
-				score = score/denominator.get(relation.getMovie2());
-				DecimalFormat df = new DecimalFormat("#.00");
-				score = Double.valueOf(df.format(score));
-				context.write(new Text(user + ":" + relation.getMovie2()), new DoubleWritable(score));
-				// user+movietag score
-			}
+
+
 		}
 	}
 
@@ -78,14 +69,7 @@ public class Multiplication {
 		@Override
 		public void reduce(Text key, Iterable<DoubleWritable> values, Context context)
 				throws IOException, InterruptedException {
-			//user:movie score
-			double sum = 0;
-			while(values.iterator().hasNext()) {
-				sum += values.iterator().next().get();
-			}
-			String[] tokens = key.toString().split(":");
-			int user = Integer.parseInt(tokens[0]);
-			context.write(new IntWritable(user), new Text(tokens[1] + ":" + sum));
+
 		}
 	}
 
