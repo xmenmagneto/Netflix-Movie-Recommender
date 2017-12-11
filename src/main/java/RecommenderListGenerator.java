@@ -20,6 +20,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.Mapper.Context;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+import org.apache.hadoop.yarn.webapp.hamlet.Hamlet;
 
 public class RecommenderListGenerator {
 	public static class RecommenderListGeneratorMapper extends Mapper<LongWritable, Text, IntWritable, Text> {
@@ -27,14 +28,40 @@ public class RecommenderListGenerator {
 		//filter out watched movies
 		//match movie_name to movie_id
 
+		Map<Integer, List<Integer>> watchHistory = new HashMap<Integer, List<Integer>>();
 		@Override
 		protected void setup(Context context) throws IOException {
+			//read movie watch history hashMap
+			Configuration conf = context.getConfiguration();
+			String filePath = conf.get("watchHistory");
+			Path pt = new Path(filePath);
+			FileSystem fs = FileSystem.get(conf);
+			BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(pt)));
+			String line = br.readLine();
 
+			//user, movie, rating
+			while (line != null) {
+				int user = Integer.parseInt(line.split(",")[0]);
+				int movie = Integer.parseInt(line.split(",")[1]);
+				if (watchHistory.containsKey(user)) {
+					watchHistory.get(user).add(movie);
+				} else {
+					List<Integer> list = new ArrayList<Integer>();
+					list.add(movie);
+					watchHistory.put(user, list);
+				}
+			}
 		}
 
 		@Override
 		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-
+			//input: user \t movie:rating
+			String[] tokens = value.toString().split("\t");
+			int user = Integer.parseInt(tokens[0]);
+			int movie = Integer.parseInt(tokens[1]);
+			if (!watchHistory.get(user).contains(movie)) { //没看过这个电影
+				context.write(new IntWritable(user), new Text(movie + ":" + tokens[2]));
+			}
 		}
 	}
 
@@ -49,7 +76,7 @@ public class RecommenderListGenerator {
 		@Override
 		public void reduce(IntWritable key, Iterable<Text> values, Context context)
 				throws IOException, InterruptedException {
-
+			//match movie name to movie id
 		}
 	}
 
