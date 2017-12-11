@@ -50,7 +50,7 @@ public class DataDividerByUser {
 
 		Configuration conf = new Configuration();
 
-		Job job = Job.getInstance(conf);
+		Job job = Job.getInstance();
 		job.setMapperClass(DataDividerMapper.class);
 		job.setReducerClass(DataDividerReducer.class);
 
@@ -64,7 +64,7 @@ public class DataDividerByUser {
 		TextInputFormat.setInputPaths(job, new Path(args[0]));
 		TextOutputFormat.setOutputPath(job, new Path(args[1]));
 
-		job.waitForCompletion(true);
+		job.waitForCompletion(true); //只有这个job完成了，后面的才能开始
 	}
 
 }
