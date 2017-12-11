@@ -92,7 +92,6 @@ public class Multiplication {
 				//输出结果user \t movieTag:score
 				//==> user + movieTag : score
 			}
-
 		}
 	}
 
@@ -101,30 +100,37 @@ public class Multiplication {
 		@Override
 		public void reduce(Text key, Iterable<DoubleWritable> values, Context context)
 				throws IOException, InterruptedException {
-
+			//user+movie score
+			double sum = 0;
+			while (values.iterator().hasNext()) {
+				sum += values.iterator().next().get();
+			}
+			String[] tokens = key.toString().split(":");
+			int user = Integer.parseInt(tokens[0]);
+			context.write(new IntWritable(user), new Text(tokens[1] + ":" + sum));  //user 对这个movie的打分
 		}
 	}
 
 	public static void main(String[] args) throws Exception {
-//		Configuration conf = new Configuration();
-//		conf.set("coOccurrencePath", args[0]);
-//
-//		Job job = Job.getInstance();
-//		job.setMapperClass(MultiplicationMapper.class);
-//		job.setReducerClass(MultiplicationReducer.class);
-//
-//		job.setJarByClass(Multiplication.class);
-//
-//		job.setInputFormatClass(TextInputFormat.class);
-//		job.setOutputFormatClass(TextOutputFormat.class);
-//		job.setOutputKeyClass(IntWritable.class);
-//		job.setOutputValueClass(Text.class);
-//		job.setMapOutputKeyClass(Text.class);
-//		job.setMapOutputValueClass(DoubleWritable.class);
-//
-//		TextInputFormat.setInputPaths(job, new Path(args[1]));
-//		TextOutputFormat.setOutputPath(job, new Path(args[2]));
-//
-//		job.waitForCompletion(true);
+		Configuration conf = new Configuration();
+		conf.set("coOccurrencePath", args[0]);
+
+		Job job = Job.getInstance();
+		job.setMapperClass(MultiplicationMapper.class);
+		job.setReducerClass(MultiplicationReducer.class);
+
+		job.setJarByClass(Multiplication.class);
+
+		job.setInputFormatClass(TextInputFormat.class);
+		job.setOutputFormatClass(TextOutputFormat.class);
+		job.setOutputKeyClass(IntWritable.class);
+		job.setOutputValueClass(Text.class);
+		job.setMapOutputKeyClass(Text.class);
+		job.setMapOutputValueClass(DoubleWritable.class);
+
+		TextInputFormat.setInputPaths(job, new Path(args[1]));
+		TextOutputFormat.setOutputPath(job, new Path(args[2]));
+
+		job.waitForCompletion(true);
 	}
 }
