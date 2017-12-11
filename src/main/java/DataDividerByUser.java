@@ -20,6 +20,12 @@ public class DataDividerByUser {
 
 			//input user,movie,rating
 			//divide data by user
+			String[] user_movie_rating = value.toString().trim().split(",");
+			int userID = Integer.parseInt(user_movie_rating[0]);
+			String movieID = user_movie_rating[1];
+			String rating = user_movie_rating[2];
+
+			context.write(new IntWritable(userID), new Text(movieID + ":" + rating));
 		}
 	}
 
