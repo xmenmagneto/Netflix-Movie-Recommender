@@ -25,9 +25,7 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 public class Multiplication {
 	public static class MultiplicationMapper extends Mapper<LongWritable, Text, Text, DoubleWritable> {
 
-
 		Map<Integer, List<MovieRelation>> movieRelationMap = new HashMap<>();
-		Map<Integer, Integer> denominator = new HashMap<>();
 
 		@Override
 		protected void setup(Context context) throws IOException {
@@ -39,35 +37,17 @@ public class Multiplication {
 			String line = br.readLine();
 			
 			while(line != null) {
-				//movieA: movieB \t relation
-				String[] tokens = line.toString().trim().split("\t");
-				String[] movies = tokens[0].split(":");
-				
-				int movie1 = Integer.parseInt(movies[0]);
+				//movieA:movieB \t relation
+				String[] tokens = line.toString().trim.split("\t");
+				String[] moives = tokens[0].split(":");
+
+				int movie1 = Integer.parseInt(moives[0]);
 				int movie2 = Integer.parseInt(movies[1]);
-				int relation = Integer.parseInt(tokens[1]);
-				
-				MovieRelation movieRelation = new MovieRelation(movie1, movie2, relation);
-				if(movieRelationMap.containsKey(movie1)) {
-					movieRelationMap.get(movie1).add(movieRelation);
-				}
-				else {
-					List<MovieRelation> list = new ArrayList<>();
-					list.add(movieRelation);
-					movieRelationMap.put(movie1, list);
-				}
-				line = br.readLine();
+				int relation = Integer.parseInt(tokens[2]);
+
+				MovieRelation
 			}
-			br.close();
-			
-			for(Map.Entry<Integer, List<MovieRelation>> entry: movieRelationMap.entrySet()) {
-				int sum = 0;
-				for(MovieRelation relation: entry.getValue()) {
-					sum += relation.getRelation();
-				}
-				//movieA sum(relations)
-				denominator.put(entry.getKey(), sum);
-			}
+
 			
 		}
 
