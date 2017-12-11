@@ -1,3 +1,5 @@
+import java.io.IOException;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
@@ -9,8 +11,6 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
-import java.io.IOException;
-
 public class DataDividerByUser {
 	public static class DataDividerMapper extends Mapper<LongWritable, Text, IntWritable, Text> {
 
@@ -19,7 +19,6 @@ public class DataDividerByUser {
 		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 
 			//input user,movie,rating
-			//divide data by user
 			String[] user_movie_rating = value.toString().trim().split(",");
 			int userID = Integer.parseInt(user_movie_rating[0]);
 			String movieID = user_movie_rating[1];
@@ -35,13 +34,11 @@ public class DataDividerByUser {
 		public void reduce(IntWritable key, Iterable<Text> values, Context context)
 				throws IOException, InterruptedException {
 
-			//merge data for one user
-			//key = user_id, value = <movieID:rating, movieID:rating,...>
 			StringBuilder sb = new StringBuilder();
 			while (values.iterator().hasNext()) {
-				sb.append("," + values.iterator().next().toString());
+				sb.append("," + values.iterator().next());
 			}
-
+			//key = user value=movie1:rating, movie2:rating...
 			context.write(key, new Text(sb.toString().replaceFirst(",", "")));
 		}
 	}
@@ -64,7 +61,7 @@ public class DataDividerByUser {
 		TextInputFormat.setInputPaths(job, new Path(args[0]));
 		TextOutputFormat.setOutputPath(job, new Path(args[1]));
 
-		job.waitForCompletion(true); //只有这个job完成了，后面的才能开始
+		job.waitForCompletion(true);
 	}
 
 }
