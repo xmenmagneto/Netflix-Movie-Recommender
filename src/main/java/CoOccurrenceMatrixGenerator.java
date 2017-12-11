@@ -46,6 +46,12 @@ public class CoOccurrenceMatrixGenerator {
 				throws IOException, InterruptedException {
 			//key movie1:movie2 value = iterable<1, 1, 1>
 			//calculate each two movies have been watched by how many people
+			int sum = 0;
+			while (values.iterator().hasNext()) {
+				sum += values.iterator().next().get();
+			}
+
+			context.write(key, new IntWritable(sum));
 		}
 	}
 	

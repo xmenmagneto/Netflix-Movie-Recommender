@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="32b3a420-5f64-4a30-81b6-bb6029e3fdb1" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/CoOccurrenceMatrixGenerator.java" afterPath="$PROJECT_DIR$/src/main/java/CoOccurrenceMatrixGenerator.java" />
     </list>
     <ignored path="RecommenderSystemFramework.iws" />
@@ -57,8 +56,8 @@
       <file leaf-file-name="CoOccurrenceMatrixGenerator.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/CoOccurrenceMatrixGenerator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="322">
-              <caret line="34" column="17" lean-forward="true" selection-start-line="34" selection-start-column="17" selection-end-line="34" selection-end-column="17" />
+            <state relative-caret-position="229">
+              <caret line="44" column="53" lean-forward="false" selection-start-line="44" selection-start-column="53" selection-end-line="44" selection-end-column="53" />
               <folding />
             </state>
           </provider>
@@ -500,12 +499,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1479058605718</updated>
-      <workItem from="1512944559779" duration="2833000" />
+      <workItem from="1512944559779" duration="2999000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="2833000" />
+    <option name="totallyTimeSpent" value="2999000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="392" y="24" width="898" height="773" extended-state="0" />
@@ -632,8 +631,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/CoOccurrenceMatrixGenerator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="322">
-          <caret line="34" column="17" lean-forward="true" selection-start-line="34" selection-start-column="17" selection-end-line="34" selection-end-column="17" />
+        <state relative-caret-position="229">
+          <caret line="44" column="53" lean-forward="false" selection-start-line="44" selection-start-column="53" selection-end-line="44" selection-end-column="53" />
           <folding />
         </state>
       </provider>
